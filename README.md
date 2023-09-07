@@ -1,2 +1,2 @@
 # dataset-perturbator
-Modify datasets by adding noise, removing points and jittering
+REST API to modify datasets by adding noise, removing points and jittering
