@@ -22,17 +22,17 @@ func getPertRequests(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, pertRequests)
 }
 
-// postPertRequest adds an album from JSON received in the request body.
+// postPertRequest adds a pertRequest from JSON received in the request body.
 func postPertRequest(c *gin.Context) {
 	var newPertReq structs.PertRequest
 
 	// Call BindJSON to bind the received JSON to
-	// newAlbum.
+	// newPertRequest.
 	if err := c.BindJSON(&newPertReq); err != nil {
 		return
 	}
 
-	// Add the new album to the slice.
+	// Add the new pertRequest to the slice.
 	pertRequests = append(pertRequests, newPertReq)
     fmt.Println(perturbators.ApplyPert(newPertReq))
 	c.IndentedJSON(http.StatusCreated, newPertReq)
