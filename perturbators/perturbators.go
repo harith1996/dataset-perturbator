@@ -16,3 +16,15 @@ func AddNoise(name string) string {
 	message := fmt.Sprintf("Hi, %v. Welcome! I am the noise adder :)", name)
 	return message
 }
+
+func Jitter(name string) string {
+    // Return a greeting that embeds the name in a message.
+    message := fmt.Sprintf("Hi, %v. Welcome! I am the jitterer :)", name)
+    return message
+}
+
+func Downsample(name string) string {
+    // Return a greeting that embeds the name in a message.
+    message := fmt.Sprintf("Hi, %v. Welcome! I am the downsampler :)", name)
+    return message
+}
