@@ -9,12 +9,14 @@ import (
 	"perturbators"
 
 	"structs"
+
+	"github.com/google/uuid"
 )
 
 var pertRequests = []structs.PertRequest{
-	{RawData: "x,y\n1,2\n2,3", Perturb: "add_noise", PerturbLevel: 1},
-	{RawData: "x,y\n14,27\n23,38", Perturb: "jitter", PerturbLevel: 2},
-	{RawData: "x,y\n19,22\n25,32", Perturb: "downsample", PerturbLevel: 3},
+	{ID: uuid.NewString(), RawData: "x,y\n1,2\n2,3", Perturb: "addNoise", PerturbLevel: 1},
+	{ID: uuid.NewString(), RawData: "x,y\n14,27\n23,38", Perturb: "jitter", PerturbLevel: 2},
+	{ID: uuid.NewString(), RawData: "x,y\n19,22\n25,32", Perturb: "downsample", PerturbLevel: 3},
 }
 
 // Responds with the list of all perturbation requests as JSON.
@@ -32,9 +34,12 @@ func postPertRequest(c *gin.Context) {
 		return
 	}
 
+	// Add an ID
+	newPertReq.ID = uuid.NewString()
+
 	// Add the new pertRequest to the slice.
 	pertRequests = append(pertRequests, newPertReq)
-    fmt.Println(perturbators.ApplyPert(newPertReq))
+	fmt.Println(perturbators.ApplyPert(newPertReq))
 	c.IndentedJSON(http.StatusCreated, newPertReq)
 }
 
