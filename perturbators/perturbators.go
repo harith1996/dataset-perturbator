@@ -41,14 +41,16 @@ func AddNoise(df dataframe.DataFrame, level int) (dataframe.DataFrame, string) {
 	//get mean and std dev of each column
 	xStats := df.Describe().Col("x").Float()
 	yStats := df.Describe().Col("y").Float()
-	xMean := xStats[1]
-	yMean := yStats[1]
+	// xMean := xStats[1]
+	// yMean := yStats[1]
 	// xStdDev := xStats[2]
 	// yStdDev := yStats[2]
 	xMin := xStats[3]
 	yMin := yStats[3]
-	xBound := r1.Interval{Min: xMin, Max: xMean}
-	yBound := r1.Interval{Min: yMin, Max: yMean}
+	xMax := xStats[7]
+	yMax := yStats[7]
+	xBound := r1.Interval{Min: xMin, Max: xMax}
+	yBound := r1.Interval{Min: yMin, Max: yMax}
 
 	//create a multivariate uniform distribution
 	dist := distmv.NewUniform([]r1.Interval{xBound, yBound}, nil)
