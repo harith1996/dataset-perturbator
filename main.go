@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"perturbators"
+	"example.com/dp/perturbators"
 
-	"structs"
+	"example.com/dp/structs"
 
 	"github.com/google/uuid"
 )

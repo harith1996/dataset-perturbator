@@ -3,7 +3,7 @@ package perturbators
 import (
 	"fmt"
 	"strings"
-	"structs"
+	"example.com/dp/structs"
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
