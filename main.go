@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"example.com/dp/calculators"
+	"example.com/dp/dataservice"
 	"example.com/dp/perturbators"
 
 	"example.com/dp/structs"
@@ -43,9 +45,27 @@ func postPertRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newPertReq)
 }
 
+func getTimeMapFields(c *gin.Context) {
+	df := dataservice.ReadCSV("./data/monitoring_cruises_Feb2011_Dec2021_stationTF0286.csv")
+	timeList := df.Col("Time").Records()
+	customLayout := "02-01-2006 15:04:05"
+	diffs := calculators.GetTimeMapLists(customLayout, timeList)
+	diff0 := make([]float64, 0)
+	diff1 := make([]float64, 0)
+	for i, _ := range diffs {
+		diff0 = append(diff0, diffs[i][0])
+		diff1 = append(diff1, diffs[i][1])
+	}
+	df = dataservice.AddColumn(&df, diff0, "diffPrev")
+	df = dataservice.AddColumn(&df, diff1, "diffNext")
+	dataservice.WriteToFile(df, "timeMapAdded.csv")
+	c.IndentedJSON(http.StatusOK, diffs)
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/pertRequests", getPertRequests)
 	router.POST("/pertRequests", postPertRequest)
+	router.GET("/getTimeMapFields", getTimeMapFields)
 	router.Run("localhost:8080")
 }
