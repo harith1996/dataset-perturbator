@@ -2,24 +2,20 @@ package perturbators
 
 import (
 	"fmt"
-	"strings"
 	"example.com/dp/structs"
-
+	"example.com/dp/dataservice"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	"gonum.org/v1/gonum/spatial/r1"
 	"gonum.org/v1/gonum/stat/distmv"
 )
 
-func ParseRawData(rawData string) dataframe.DataFrame {
-	df := dataframe.ReadCSV(strings.NewReader(rawData))
-	return df
-}
+
 
 func ApplyPert(request structs.PertRequest) dataframe.DataFrame {
 	message := fmt.Sprintf("Applying %v to dataset", request.Perturb)
 	fmt.Println(message)
-	df := ParseRawData(request.RawData)
+	df := dataservice.ParseRawData(request.RawData)
 	print(df.Records())
 	method := AddNoise
 	switch request.Perturb {
