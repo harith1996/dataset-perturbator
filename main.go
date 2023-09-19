@@ -5,13 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-gota/gota/series"
 
 	"example.com/dp/calculators"
 	"example.com/dp/dataservice"
 	"example.com/dp/perturbators"
-
 	"example.com/dp/structs"
-
 	"github.com/google/uuid"
 )
 
@@ -45,7 +44,7 @@ func postPertRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newPertReq)
 }
 
-func getTimeMapFields(c *gin.Context) {
+func addTimeMapFields(c *gin.Context) {
 	df := dataservice.ReadCSV("./data/monitoring_cruises_Feb2011_Dec2021_stationTF0286.csv")
 	timeList := df.Col("Time").Records()
 	customLayout := "02-01-2006 15:04:05"
@@ -62,10 +61,38 @@ func getTimeMapFields(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, diffs)
 }
 
+func addExpeditionField(c *gin.Context) {
+	df_data := dataservice.ReadCSV("./timeMapAdded.csv")
+	df_exped := dataservice.ReadCSV("./data/monitoring_cruises_Feb2011_Dec2021_stationTF0286_expedition_details.csv")
+	layout_data := "02-01-2006 15:04:05"
+	layout_exped := "02-01-06 15:04:05"
+	exp_starts := df_exped.Col("Time (start)").Records()
+	exp_ends := df_exped.Col("Time (end)").Records()
+
+	for i, _ := range exp_ends {
+		exp_starts[i] = calculators.AddEndOfDayTime(exp_starts[i])
+		exp_ends[i] = calculators.AddEndOfDayTime(exp_ends[i])
+	}
+
+	data_timestamps := df_data.Col("Time").Records()
+	exp_names := make([]string, 0)
+	for _, t := range data_timestamps {
+		for j := 0; j < len(exp_ends); j++ {
+			if calculators.IsInTimeInterval(layout_data, layout_exped, t, []string{exp_starts[j], exp_ends[j]}) {
+				exp_names = append(exp_names, df_exped.Col("Cruise Number").Records()[j])
+			}
+		}
+	}
+	df_data = df_data.Mutate(series.New(exp_names, series.String, "Expedition Number"))
+	dataservice.WriteToFile(df_data, "expeditionAdded.csv")
+	c.IndentedJSON(http.StatusOK, exp_names)
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/pertRequests", getPertRequests)
 	router.POST("/pertRequests", postPertRequest)
-	router.GET("/getTimeMapFields", getTimeMapFields)
+	router.GET("/addTimeMapFields", addTimeMapFields)
+	router.GET("/addExpeditionFields", addExpeditionField)
 	router.Run("localhost:8080")
 }
