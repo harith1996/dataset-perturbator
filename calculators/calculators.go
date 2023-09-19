@@ -43,3 +43,15 @@ func GetTimeMapLists(layout string, times []string) [][]float64 {
 	}
 	return diffs
 }
+
+// checks if "time" is in interval
+func IsInTimeInterval(layoutT string, layoutI string, timeString string, intervalStrings []string) bool {
+	timeObject, _ := time.Parse(layoutT, timeString)
+	time0, _ := time.Parse(layoutI, intervalStrings[0])
+	time1, _ := time.Parse(layoutI, intervalStrings[1])
+	return time0.Before(timeObject) && timeObject.Before(time1)
+}
+
+func AddEndOfDayTime(dateString string) string {
+	return dateString + " 23:59:59"
+}
