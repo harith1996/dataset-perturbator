@@ -6,19 +6,23 @@ import (
 	"time"
 )
 
-func GetTimeMapLists(layout string, times []string) [][]float64 {
-	fmt.Println("Computing time map lists")
-	// layout := "2006-01-02T15:04:05Z"
-	// customLayout := "02-01-2006 15:04:05"
+func getTimeObjects(layout string, times []string) []time.Time {
 	timeObjects := []time.Time{}
 	for _, timeString := range times {
 		timeObject, _ := time.Parse(layout, timeString)
 		timeObjects = append(timeObjects, timeObject)
 	}
-	//sort the time objects
 	sort.SliceStable(timeObjects, func(i, j int) bool {
 		return timeObjects[i].Before(timeObjects[j])
 	})
+	return timeObjects
+}
+
+func GetTimeMapLists(layout string, times []string) [][]float64 {
+	fmt.Println("Computing time map lists")
+	// layout := "2006-01-02T15:04:05Z"
+	// customLayout := "02-01-2006 15:04:05"
+	timeObjects := getTimeObjects(layout, times)
 
 	diffBefore := []float64{}
 	diffAfter := []float64{}
@@ -38,13 +42,13 @@ func GetTimeMapLists(layout string, times []string) [][]float64 {
 
 	//return the two lists as a single list
 	diffs := make([][]float64, 0)
-	for i, _ := range diffBefore {
+	for i := range diffBefore {
 		diffs = append(diffs, []float64{diffBefore[i], diffAfter[i]})
 	}
 	return diffs
 }
 
-// checks if "time" is in interval
+// checks if a given "timeString" is within a time interval
 func IsInTimeInterval(layoutT string, layoutI string, timeString string, intervalStrings []string) bool {
 	timeObject, _ := time.Parse(layoutT, timeString)
 	time0, _ := time.Parse(layoutI, intervalStrings[0])
@@ -54,4 +58,10 @@ func IsInTimeInterval(layoutT string, layoutI string, timeString string, interva
 
 func AddEndOfDayTime(dateString string) string {
 	return dateString + " 23:59:59"
+}
+
+//takes in a list of sorted measurements, and returns the difference
+//between adjacent measurements for each value
+func ComputeMeasurementDiffs(sortedValues []float64) {
+
 }
