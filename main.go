@@ -8,6 +8,7 @@ import (
 	"github.com/go-gota/gota/series"
 
 	"example.com/dp/calculators"
+	"example.com/dp/classes/dateTime"
 	"example.com/dp/dataservice"
 	"example.com/dp/perturbators"
 	"example.com/dp/structs"
@@ -70,15 +71,15 @@ func addExpeditionField(c *gin.Context) {
 	exp_ends := df_exped.Col("Time (end)").Records()
 
 	for i, _ := range exp_ends {
-		exp_starts[i] = calculators.AddEndOfDayTime(exp_starts[i])
-		exp_ends[i] = calculators.AddEndOfDayTime(exp_ends[i])
+		exp_starts[i] = dateTime.AddEndOfDayTime(exp_starts[i])
+		exp_ends[i] = dateTime.AddEndOfDayTime(exp_ends[i])
 	}
 
 	data_timestamps := df_data.Col("Time").Records()
 	exp_names := make([]string, 0)
 	for _, t := range data_timestamps {
 		for j := 0; j < len(exp_ends); j++ {
-			if calculators.IsInTimeInterval(layout_data, layout_exped, t, []string{exp_starts[j], exp_ends[j]}) {
+			if dateTime.IsInTimeInterval(layout_data, layout_exped, t, []string{exp_starts[j], exp_ends[j]}) {
 				exp_names = append(exp_names, df_exped.Col("Cruise Number").Records()[j])
 			}
 		}
@@ -92,7 +93,9 @@ func main() {
 	router := gin.Default()
 	router.GET("/pertRequests", getPertRequests)
 	router.POST("/pertRequests", postPertRequest)
+
 	router.GET("/addTimeMapFields", addTimeMapFields)
 	router.GET("/addExpeditionFields", addExpeditionField)
+
 	router.Run("localhost:8080")
 }
