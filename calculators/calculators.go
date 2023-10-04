@@ -2,12 +2,12 @@ package calculators
 
 import (
 	"example.com/dp/classes/dateTime"
+	"example.com/dp/classes"
 	"fmt"
 )
-
 // supply a list of values and a diff function
 // returns 2 values per list item - diffPrev and diffNext
-func GetTimeMapLists(layout string, times []string) [][]float64 {
+func GetTimeMapLists(layout string, times []string, tuple classes.DateTimeTuple) [][]float64 {
 	fmt.Println("Computing time map lists")
 	// layout := "2006-01-02T15:04:05Z"
 	// customLayout := "02-01-2006 15:04:05"
