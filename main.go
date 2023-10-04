@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-gota/gota/series"
+	"github.com/go-gota/gota/dataframe"
 
 	"example.com/dp/calculators"
 	"example.com/dp/dataservice"
@@ -60,6 +62,36 @@ func addTimeMapFields(c *gin.Context) {
 	dataservice.WriteToFile(df, "timeMapAdded.csv")
 	c.IndentedJSON(http.StatusOK, diffs)
 }
+
+func addQuantDiffFields(c *gin.Context) {
+	df := dataservice.ReadCSV("./data/monitoring_cruises_Feb2011_Dec2021_stationTF0286.csv")
+	fieldName := c.Query("fieldName")
+	linearOrderBy := c.Query("linearOrderBy")
+	sortedDf := df.Arrange(dataframe.Sort(linearOrderBy))
+	rawRecords := sortedDf.Col(fieldName).Records()
+	parsedRecords := make([]float64, len(rawRecords))
+ 
+    for i, s := range rawRecords {
+        num, err := strconv.ParseFloat(s, 64)
+        if err != nil {
+            fmt.Println("Error:", err)
+            return
+        }
+        parsedRecords[i] = num
+    }
+	diffs := calculators.GetQuantDiffs(parsedRecords)
+	diff0 := make([]float64, 0)
+	diff1 := make([]float64, 0)
+	for i, _ := range diffs {
+		diff0 = append(diff0, diffs[i][0])
+		diff1 = append(diff1, diffs[i][1])
+	}
+	df = dataservice.AddColumn(&df, diff0, "diffPrev"+"_"+fieldName)
+	df = dataservice.AddColumn(&df, diff1, "diffNext"+"_"+fieldName)
+	dataservice.WriteToFile(df, "timeMapAdded.csv")
+	c.IndentedJSON(http.StatusOK, diffs)
+}
+
 
 func addExpeditionField(c *gin.Context) {
 	df_data := dataservice.ReadCSV("./timeMapAdded.csv")

@@ -48,6 +48,31 @@ func GetTimeMapLists(layout string, times []string) [][]float64 {
 	return diffs
 }
 
+func GetQuantDiffs(values []float64) [][]float64 {
+	diffBefore := []float64{}
+	diffAfter := []float64{}
+
+	for i, v := range values {
+		if i == 0 {
+			diffBefore = append(diffBefore, 0)
+			diffAfter = append(diffAfter, values[i+1]-v)
+		} else if i == len(values)-1 {
+			diffAfter = append(diffAfter, 0)
+			diffBefore = append(diffBefore, v-values[i-1])
+		} else {
+			diffBefore = append(diffBefore, v-values[i-1])
+			diffAfter = append(diffAfter, values[i+1]-v)
+		}
+	}
+
+	//return the two lists as a single list
+	diffs := make([][]float64, 0)
+	for i := range diffBefore {
+		diffs = append(diffs, []float64{diffBefore[i], diffAfter[i]})
+	}
+	return diffs
+}
+
 // checks if a given "timeString" is within a time interval
 func IsInTimeInterval(layoutT string, layoutI string, timeString string, intervalStrings []string) bool {
 	timeObject, _ := time.Parse(layoutT, timeString)
@@ -60,8 +85,8 @@ func AddEndOfDayTime(dateString string) string {
 	return dateString + " 23:59:59"
 }
 
-//takes in a list of sorted measurements, and returns the difference
-//between adjacent measurements for each value
+// takes in a list of sorted measurements, and returns the difference
+// between adjacent measurements for each value
 func ComputeMeasurementDiffs(sortedValues []float64) {
 
 }
